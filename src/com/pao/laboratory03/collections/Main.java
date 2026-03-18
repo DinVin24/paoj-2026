@@ -1,4 +1,50 @@
 package com.pao.laboratory03.collections;
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("==== HashMap ====");
+        String[] words = {"java", "python", "java", "c++", "python", "java", "rust", "c++", "go"};
+        HashMap<String, Integer> contor = new HashMap<>();
+        for (String w : words)
+            contor.put(w, contor.getOrDefault(w,0)+1);
+        System.out.println("Frecventa: " + contor);
+
+        System.out.print("Contine 'rust'?");
+        if (contor.containsKey("rust"))
+            System.out.println(" true");
+        else
+            System.out.println(" false");
+
+        System.out.println("Chei: " + contor.keySet());
+        System.out.println("Valori: " + contor.values());
+
+        for(Map.Entry<String, Integer> w : contor.entrySet())
+            System.out.println(w.getKey() + " -> " + w.getValue());
+
+        System.out.println("==== TreeMap ====");
+
+        TreeMap<String, Integer> copac = new TreeMap<>(contor);
+        System.out.println("Sortat: " + copac);
+
+        System.out.println("Prima cheie: " + copac.firstKey());
+        System.out.println("Ultima cheie: " + copac.lastKey());
+
+        System.out.println("==== Map cu obiecte ====");
+
+        HashMap<String, List<String>> cursuri = new HashMap<>();
+
+        cursuri.put("PAOJ", new ArrayList<>(Arrays.asList("Ana", "Mihai", "Ion")));
+        cursuri.put("BD", new ArrayList<>(Arrays.asList("Ana", "Elena")));
+
+        System.out.println("Studenti la PAOJ: " + cursuri.get("PAOJ"));
+
+        List<String> studBD = cursuri.get("BD");
+        studBD.add("George");
+        System.out.println("Studenti la BD (actualizat): " + cursuri.get("BD"));
+    }
+
+}
 
 /**
  * Exercițiul 1 — Colecții: HashMap și TreeMap
@@ -48,9 +94,5 @@ package com.pao.laboratory03.collections;
  * Studenți la PAOJ: [Ana, Mihai, Ion]
  * Studenți la BD (actualizat): [Ana, Elena, George]
  */
-public class Main {
-    public static void main(String[] args) {
-        // TODO: implementează cele 3 părți de mai sus
-    }
-}
+
 

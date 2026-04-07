@@ -1,13 +1,15 @@
 package com.pao.test;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.patch.Patch;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Utilitar pentru testarea automată a exercițiilor I/O.

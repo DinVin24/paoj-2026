@@ -37,7 +37,7 @@ public abstract sealed class Comanda permits ComandaStandard, ComandaRedusa, Com
 Importă enum-ul de stări din exercițiul anterior:
 
 ```java
-import com.pao.laboratory07.exercise1.OrderState;
+
 ```
 
 Fiecare comandă primește automat starea inițială `OrderState.PLACED` la construire. Nu este nevoie să o citești din input — este mereu `PLACED`.

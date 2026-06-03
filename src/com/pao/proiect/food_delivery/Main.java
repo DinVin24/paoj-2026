@@ -17,7 +17,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("=== PLATFORMA FOOD DELIVERY JDBC — Demo Etapa II ===\n");
+        System.out.println("=== PLATFORMA FOOD DELIVERY - Etapa II ===\n");
 
         try {
             initializeazaBazaDeDate();
@@ -27,7 +27,7 @@ public class Main {
             ServiciuClient serviciuClient = ServiciuClient.getInstance();
             ServiciuComanda serviciuComanda = ServiciuComanda.getInstance();
 
-            //Adauga restaurante ----
+            //1 Adauga restaurante
             Restaurant r1 = new Restaurant(1, "Bella Italia", "Italiana",
                     new Adresa("Calea Victoriei 10", "Bucuresti", "010011", "Romania"));
             Restaurant r2 = new Restaurant(2, "Sushi Palace", "Japoneza",
@@ -40,7 +40,7 @@ public class Main {
             audit.log("adauga_restaurant");
             System.out.println("1. Restaurante adaugate in SQLite.");
 
-            //Inregistreaza clienti ----
+            //2 Inregistreaza clienti
             Client c1 = new Client(1, "Ana Ionescu", "ana@mail.com", "0721000001",
                     new Adresa("Str. Florilor 1", "Bucuresti", "010001", "Romania"));
             Client c2 = new Client(2, "Mihai Popescu", "mihai@mail.com", "0721000002",
@@ -50,18 +50,15 @@ public class Main {
             audit.log("inregistreaza_client");
             System.out.println("2. Clienti inregistrati in SQLite.");
 
-            //Inregistreaza sofer ----
+            //3 Inregistreaza sofer
             Sofer s1 = new Sofer(1, "Ion Vasile", "ion@sofer.com", "0723000001",
                     new Adresa("Str. Motilor 7", "Bucuresti", "020001", "Romania"),
                     "Motocicleta", "B-00-ION");
-            // Notă: Soferul se salvează automat la asignare sau manual prin Serviciu /
-            // Repository
-            // Îl salvam în baza de date direct prin repository-ul său
             new com.pao.proiect.food_delivery.repository.SoferRepository().save(s1);
             audit.log("inregistreaza_sofer");
             System.out.println("3. Sofer inregistrat in SQLite: " + s1);
 
-            // ---- Actiunea 4: Adauga preparate in meniuri ----
+            //4 Adauga preparate in meniuri
             Preparat pizza = new Preparat(1, "Pizza Margherita", "Rosie si mozzarella clasica", 32.00);
             Preparat paste = new Preparat(2, "Paste Carbonara", "Paste cremoase cu bacon", 28.50);
             Preparat sushi = new Preparat(3, "Rulou Somon", "8 bucati rulou somon", 45.00);
@@ -76,7 +73,7 @@ public class Main {
             System.out.println("4. Meniu Bella Italia actualizat:");
             serviciuRestaurant.getMeniu(r1.getId()).forEach(p -> System.out.println("   " + p));
 
-            // ---- Actiunea 5: Plaseaza comenzi (TRANZACTIE) ----
+            //5 Plaseaza comenzi (TRANZACTIE)
             List<ArticolComanda> articole1 = Arrays.asList(
                     new ArticolComanda(pizza, 1),
                     new ArticolComanda(paste, 2));
@@ -86,12 +83,12 @@ public class Main {
             Comanda comanda2 = serviciuComanda.plaseazaComanda(c2, r3, articole2);
             audit.log("plaseaza_comanda");
 
-            // ---- Actiunea 6: Asigneaza un sofer la comanda ----
+            //6 Asigneaza un sofer la comanda
             serviciuComanda.asigneazaSofer(comanda1.getId(), s1);
             audit.log("asigneaza_sofer");
             System.out.println("6. Soferul '" + s1.getNume() + "' asignat la comanda #" + comanda1.getId());
 
-            // ---- Actiunea 7: Cauta restaurante dupa tipul de bucatarie ----
+            //7 Cauta restaurante dupa tipul de bucatarie
             String tipCautat = "Italiana";
             List<Restaurant> restauranteBucatarie = serviciuRestaurant.cautaDupaBucatarie(tipCautat);
             audit.log("cauta_restaurante_bucatarie");
@@ -99,20 +96,20 @@ public class Main {
                     .println("7. Restaurante cu bucatarie '" + tipCautat + "' (" + restauranteBucatarie.size() + "):");
             restauranteBucatarie.forEach(r -> System.out.println("   " + r));
 
-            // ---- Actiunea 8: Listeaza comenzile active ale unui sofer ----
+            //8 Listeaza comenzile active ale unui sofer
             List<Comanda> comenziActiveSofer = serviciuComanda.listeazaDupaSofer(s1);
             audit.log("listeaza_comenzi_sofer");
             System.out.println("8. Comenzi active pentru '" + s1.getNume() + "':");
             comenziActiveSofer.forEach(c -> System.out.println("   " + c));
 
-            // ---- Actiunea 9: Vizualizeaza istoricul comenzilor unui client (LIVRARE) ----
+            //9 Vizualizeaza istoricul comenzilor unui client (LIVRARE)
             serviciuComanda.livreaza(comanda1.getId());
             List<InregistrareComanda> istoric = serviciuComanda.getIstoricClient(c1.getId());
             audit.log("get_istoric_client");
             System.out.println("9. Istoric livrari client '" + c1.getNume() + "':");
             istoric.forEach(inr -> System.out.println("   " + inr));
 
-            // ---- Actiunea 10: Anuleaza o comanda ----
+            //10 Anuleaza o comanda
             try {
                 serviciuComanda.anuleaza(comanda2.getId());
                 System.out.println(
@@ -136,11 +133,10 @@ public class Main {
             System.out.println("\nJOIN 3: Raport istoric complet detaliat pentru Client ID = 1:");
             serviciuComanda.getIstoricCompletClientRaport(1).forEach(linie -> System.out.println("  " + linie));
 
-            System.out.println("\n=== Demo finalizat cu succes. Verifica audit.csv ===");
-            DatabaseConnection.getInstance().close(); // Inchidem conexiunea la finalul programului
+            DatabaseConnection.getInstance().close();
 
         } catch (Exception e) {
-            System.err.println("Eroare neasteptata in Main: " + e.getMessage());
+            System.err.println("Eroare: " + e.getMessage());
             e.printStackTrace();
         }
     }

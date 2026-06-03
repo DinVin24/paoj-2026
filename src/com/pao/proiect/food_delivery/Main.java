@@ -122,8 +122,6 @@ public class Main {
             }
             audit.log("anuleaza_comanda");
 
-            System.out.println("\n=== RAPOARTE BAZATE PE INTEROGARI JOIN COMPLEXE ===");
-
             System.out.println("\nJOIN 1: Comenzile active (neasignate sau asignate) cu detalii client si livrator:");
             serviciuComanda.getComenziActiveCuDetalii().forEach(linie -> System.out.println("  " + linie));
 

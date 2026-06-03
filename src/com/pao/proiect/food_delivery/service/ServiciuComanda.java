@@ -42,7 +42,7 @@ public class ServiciuComanda {
         return DatabaseConnection.getInstance().getConnection();
     }
 
-    // baerm rand 5 - tranzactie explicita
+    // barem rand 5 - tranzactie explicita
     public Comanda plaseazaComanda(Client client, Restaurant restaurant, List<ArticolComanda> articole) throws SQLException, IOException {
         if (client == null)
             throw new IllegalArgumentException("Clientul nu poate fi null");
@@ -55,17 +55,14 @@ public class ServiciuComanda {
         conn.setAutoCommit(false); // Dezactivam commits
 
         try {
-            // Asiguram existenta clientului si restaurantului in DB inainte de plasarea comenzii
             if (!clientRepository.findById(client.getId()).isPresent()) {
                 clientRepository.save(client);
             }
 
             Comanda comanda = new Comanda(urmatoareId++, client, restaurant, articole);
 
-            // Pasul 1: Salvam comanda principala
             comandaRepository.save(comanda);
 
-            // Pasul 2: Salvam articolele comenzii in tabela de legatura (articole_comanda)
             String sqlArticol = "INSERT INTO articole_comanda (id_comanda, id_preparat, cantitate) VALUES (?, ?, ?)";
             try (PreparedStatement ps = conn.prepareStatement(sqlArticol)) {
                 for (ArticolComanda art : articole) {
@@ -76,16 +73,16 @@ public class ServiciuComanda {
                 }
             }
 
-            conn.commit(); // Toate scrierile au reusit -> salvam definitiv
+            conn.commit();
             System.out.println("[TX] plaseazaComanda comisa cu succes in SQLite. Comanda ID=" + comanda.getId());
             return comanda;
 
         } catch (SQLException e) {
-            conn.rollback(); // Ceva a esuat -> anulam toate modificarile partiale
+            conn.rollback();
             System.out.println("[TX] plaseazaComanda rollback din cauza: " + e.getMessage());
             throw e;
         } finally {
-            conn.setAutoCommit(true); // Re-activam comportamentul implicit
+            conn.setAutoCommit(true);
         }
     }
 
@@ -99,7 +96,6 @@ public class ServiciuComanda {
         if (comanda.getStatus() != StatusComanda.IN_ASTEPTARE)
             throw new IllegalStateException("Doar comenzile IN_ASTEPTARE pot primi un sofer");
 
-        // Asiguram existenta soferului in DB
         if (!soferRepository.findById(sofer.getId()).isPresent()) {
             soferRepository.save(sofer);
         }
@@ -108,7 +104,6 @@ public class ServiciuComanda {
         comanda.setStatus(StatusComanda.ASIGNAT);
         sofer.setDisponibil(false);
 
-        // Actualizam entitatile in DB
         comandaRepository.update(comanda);
         soferRepository.update(sofer);
 
@@ -192,11 +187,8 @@ public class ServiciuComanda {
         return new LinkedList<>(inAsteptare);
     }
 
-   // rand 6 barem 3 interogari sql join
-    /**
-     * JOIN #1: Listeaza comenzile active (care nu sunt LIVRATE/ANULATE)
-     * cu detaliile complete ale clientului si ale soferului asignat.
-     */
+   // rand 6 -> 3 interogari sql join
+
     public List<String> getComenziActiveCuDetalii() throws SQLException, IOException {
         String sql = """
                 SELECT c.id, c.status, c.total,
@@ -227,9 +219,6 @@ public class ServiciuComanda {
         return rezultate;
     }
 
-    /**
-     * JOIN #2: Top 5 preparate cele mai comandate de pe platforma, cu numele restaurantului.
-     */
     public List<String> getTopPreparateComandate() throws SQLException, IOException {
         String sql = """
                 SELECT p.nume      AS prep_nume,
@@ -255,9 +244,6 @@ public class ServiciuComanda {
         return rezultate;
     }
 
-    /**
-     * JOIN #3: Istoricul detaliat al unui client (toate preparatele comandate si livratorul lor).
-     */
     public List<String> getIstoricCompletClientRaport(int idClient) throws SQLException, IOException {
         String sql = """
                 SELECT c.id AS comanda_id, c.data_crearii, c.status, c.total,
